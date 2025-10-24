@@ -4,7 +4,7 @@ Autonomous Software Architect & Data-Science Engineering Platform
 """
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse
 from typing import List, Optional, Dict, Any
 import asyncio
 import json
@@ -23,7 +23,8 @@ from .llm_wrapper import llm
 from .sandbox_runner import sandbox
 from .ingestion import ingestion
 from .auth import get_current_user, authenticate_user, create_access_token
-from .cloud_drives import get_cloud_client, CloudProvider
+from .cloud_drives import get_cloud_client
+from .models import CloudProvider
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -130,7 +131,7 @@ async def generate_plan(
         
         # Save plan to workspace
         plan_file = Path(workspace) / "build_plan.json"
-        plan_file.write_text(json.dumps(response.dict(), indent=2))
+        plan_file.write_text(json.dumps(response.model_dump(), indent=2))
         
         return response
     
