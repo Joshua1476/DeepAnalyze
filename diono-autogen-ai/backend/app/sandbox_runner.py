@@ -55,8 +55,9 @@ class SandboxRunner:
             class_name = filename.replace(".java", "")
             return ["/bin/sh", "-c", f"javac {filename} && java {class_name}"]
         elif language.lower() == "typescript":
-            # TypeScript requires ts-node which may not be available
-            return ["/bin/sh", "-c", f"npx ts-node {filename}"]
+            # TypeScript requires ts-node (will be installed on first run)
+            # Note: First execution may be slow due to package installation
+            return ["/bin/sh", "-c", f"npx --yes ts-node {filename}"]
         
         return commands.get(language.lower(), ["python", filename])
     

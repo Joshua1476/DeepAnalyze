@@ -42,19 +42,18 @@ for i in $(seq 1 $ITERATIONS); do
     
     # Generate code
     echo "Generating code..."
-    CODE="print('Hello from iteration $i')\nprint('Testing RL mode')"
+    CODE="print('Hello from iteration $i')
+print('Testing RL mode')"
     
-    # Execute code
+    # Execute code (using jq to properly escape JSON)
     echo "Executing code..."
     RESULT=$(curl -s -X POST http://localhost:8000/api/run \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TOKEN" \
-        -d "{
-            \"code\": \"$CODE\",
-            \"language\": \"python\",
-            \"project_name\": \"$PROJECT_NAME\",
-            \"timeout\": 60
-        }")
+        -d "$(jq -n \
+            --arg code "$CODE" \
+            --arg project "$PROJECT_NAME" \
+            '{code: $code, language: "python", project_name: $project, timeout: 60}')")
     
     echo "Result:"
     echo "$RESULT" | jq '.'

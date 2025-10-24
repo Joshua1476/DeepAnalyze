@@ -44,6 +44,8 @@ app.add_middleware(
 # WebSocket connection manager
 class ConnectionManager:
     def __init__(self):
+        # Note: Currently supports one WebSocket per session_id (last connection wins)
+        # For multiple connections per session, change to Dict[str, List[WebSocket]]
         self.active_connections: Dict[str, WebSocket] = {}
     
     async def connect(self, session_id: str, websocket: WebSocket):
