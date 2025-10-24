@@ -25,6 +25,11 @@ $workspacePath = Join-Path (Get-Location) "workspace"
 $env:HOST_WORKSPACE_PATH = $workspacePath
 Write-Host "Workspace path: $workspacePath" -ForegroundColor Cyan
 
+# Ensure workspace directory exists (Windows)
+if (-not (Test-Path $workspacePath)) {
+    New-Item -ItemType Directory -Path $workspacePath -Force | Out-Null
+}
+
 # Try Docker Compose v2 first, fall back to v1
 Write-Host "Checking Docker Compose version..." -ForegroundColor Yellow
 $composeCmd = $null

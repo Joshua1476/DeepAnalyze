@@ -57,6 +57,11 @@ echo ""
 export HOST_WORKSPACE_PATH="$(pwd)/workspace"
 echo "Workspace path: $HOST_WORKSPACE_PATH"
 
+# Ensure workspace directory exists and is writable
+mkdir -p "$HOST_WORKSPACE_PATH"
+# Give permissive permissions for quick local development. Adjust as needed for production.
+chmod 0777 "$HOST_WORKSPACE_PATH"
+
 # Start services using detected compose command
 $COMPOSE_CMD up -d
 
@@ -67,9 +72,9 @@ sleep 5
 # Check if services are running
 if $COMPOSE_CMD ps | grep -q "Up"; then
     echo ""
-    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "╔════════════════════════════════════════════════════════════╗[...]"
     echo "║                   🎉 Success!                              ║"
-    echo "╚════════════════════════════════════════════════════════════╝"
+    echo "╚════════════════════════════════════════════════════════════╝[...]"
     echo ""
     echo "Services are running:"
     echo ""
