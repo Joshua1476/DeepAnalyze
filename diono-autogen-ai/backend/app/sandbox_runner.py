@@ -42,13 +42,22 @@ class SandboxRunner:
         commands = {
             "python": ["python", filename],
             "javascript": ["node", filename],
-            "typescript": ["ts-node", filename],
-            "java": ["java", filename],
-            "go": ["go", "run", filename],
-            "rust": ["rustc", filename, "&&", "./main"],
             "ruby": ["ruby", filename],
             "php": ["php", filename],
+            "go": ["go", "run", filename],
         }
+        
+        # Compiled languages need shell commands
+        if language.lower() == "rust":
+            return ["/bin/sh", "-c", f"rustc {filename} && ./code"]
+        elif language.lower() == "java":
+            # Extract class name from filename
+            class_name = filename.replace(".java", "")
+            return ["/bin/sh", "-c", f"javac {filename} && java {class_name}"]
+        elif language.lower() == "typescript":
+            # TypeScript requires ts-node which may not be available
+            return ["/bin/sh", "-c", f"npx ts-node {filename}"]
+        
         return commands.get(language.lower(), ["python", filename])
     
     def _get_file_extension(self, language: str) -> str:

@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from .config import settings
 from .crypto_utils import crypto
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

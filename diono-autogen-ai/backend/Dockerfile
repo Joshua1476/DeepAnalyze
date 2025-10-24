@@ -9,12 +9,8 @@ RUN apt-get update && apt-get install -y \
     g++ \
     git \
     curl \
+    libmagic1 \
     && rm -rf /var/lib/apt/lists/*
-
-# Install Docker CLI (for sandbox execution)
-RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
-    sh get-docker.sh && \
-    rm get-docker.sh
 
 # Copy requirements
 COPY requirements.txt .

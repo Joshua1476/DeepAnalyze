@@ -30,7 +30,8 @@ export default function Dashboard() {
   
   useEffect(() => {
     // Connect WebSocket
-    const websocket = new WebSocket(`ws://localhost:8000/ws/${user?.username || 'default'}`)
+    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000'
+    const websocket = new WebSocket(`${wsUrl}/ws/${user?.username || 'default'}`)
     
     websocket.onopen = () => {
       console.log('WebSocket connected')

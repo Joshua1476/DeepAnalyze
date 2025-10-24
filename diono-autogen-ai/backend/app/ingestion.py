@@ -6,7 +6,6 @@ from typing import List, Dict, Any, Optional
 import json
 import pandas as pd
 from loguru import logger
-import magic
 
 
 class DocumentIngestion:

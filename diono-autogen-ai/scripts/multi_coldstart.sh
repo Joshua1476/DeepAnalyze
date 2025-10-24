@@ -18,6 +18,19 @@ if ! curl -s http://localhost:8000/health > /dev/null; then
     exit 1
 fi
 
+# Get authentication token
+echo "Authenticating..."
+TOKEN_RESPONSE=$(curl -s -X POST http://localhost:8000/api/token \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "username=demo&password=demo")
+
+TOKEN=$(echo $TOKEN_RESPONSE | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
+
+if [ -z "$TOKEN" ]; then
+    echo "Error: Failed to authenticate"
+    exit 1
+fi
+
 echo "Initializing ${#PROJECTS[@]} projects..."
 echo ""
 
@@ -34,7 +47,7 @@ for project in "${PROJECTS[@]}"; do
     echo "Generating build plan..."
     curl -s -X POST http://localhost:8000/api/plan \
         -H "Content-Type: application/json" \
-        -H "Authorization: Bearer demo-token" \
+        -H "Authorization: Bearer $TOKEN" \
         -d "{
             \"description\": \"$description\",
             \"project_name\": \"$name\",
