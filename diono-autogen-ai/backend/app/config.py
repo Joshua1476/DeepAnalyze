@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
     
     # CORS
-    CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:4000"]
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:4000"]
     
     # LLM Configuration
     LLM_MODEL: str = "mistral-7b-instruct"

@@ -29,7 +29,7 @@ class SandboxRunner:
             "python": "python:3.11-slim",
             "javascript": "node:18-alpine",
             "typescript": "node:18-alpine",
-            "java": "openjdk:17-slim",
+            "java": "openjdk:17-jdk-slim",  # JDK includes javac compiler
             "go": "golang:1.21-alpine",
             "rust": "rust:1.75-slim",
             "ruby": "ruby:3.2-slim",
@@ -118,7 +118,7 @@ class SandboxRunner:
                 if workspace:
                     volumes[workspace] = {"bind": "/data", "mode": "rw"}
                 
-                # Run container
+                # Run container (remove=False to safely capture logs)
                 container = self.client.containers.run(
                     image,
                     command=command,
@@ -128,13 +128,19 @@ class SandboxRunner:
                     cpu_quota=int(settings.SANDBOX_CPU_LIMIT * 100000),
                     network_disabled=False,  # Allow network for package installation
                     detach=True,
-                    remove=True
+                    remove=False  # Don't auto-remove to avoid log retrieval race
                 )
                 
                 # Wait for completion with timeout
                 try:
                     result = container.wait(timeout=timeout)
                     logs = container.logs().decode('utf-8')
+                    
+                    # Clean up container after capturing logs
+                    try:
+                        container.remove()
+                    except:
+                        pass
                     
                     execution_time = time.time() - start_time
                     
@@ -157,6 +163,7 @@ class SandboxRunner:
                     # Timeout or other error
                     try:
                         container.stop(timeout=1)
+                        container.remove()
                     except:
                         pass
                     
