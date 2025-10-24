@@ -1,33 +1,39 @@
 """
-LLM integration wrapper for open-source models
+LLM integration wrapper with multi-provider support
 """
 from typing import Optional, Dict, Any, AsyncGenerator
 import httpx
 import json
 from loguru import logger
 from .config import settings
+from .llm_providers import get_provider
 
 
 class LLMWrapper:
-    """Wrapper for open-source LLM APIs"""
+    """Wrapper for multi-provider LLM APIs"""
     
     def __init__(
         self,
+        provider: str = None,
         model: str = None,
         api_url: str = None,
         api_key: Optional[str] = None
     ):
+        self.provider_type = provider or settings.LLM_PROVIDER
         self.model = model or settings.LLM_MODEL
         
-        # Normalize API URL (strip trailing /v1 if present)
+        # Normalize API URL (strip trailing /v1 if present for OpenAI-compatible)
         base_url = (api_url or settings.LLM_API_URL).rstrip('/')
-        if base_url.endswith('/v1'):
+        if base_url.endswith('/v1') and self.provider_type in ['openai', 'anthropic', 'groq', 'together', 'openrouter', 'qwen', 'deepseek']:
             base_url = base_url[:-3]
             logger.warning(f"Stripped /v1 from LLM_API_URL: {base_url}")
         
         self.api_url = base_url
         self.api_key = api_key or settings.LLM_API_KEY
-        self.client = httpx.AsyncClient(timeout=300.0)
+        
+        # Get the appropriate provider
+        self.provider = get_provider(self.provider_type, self.api_url, self.api_key)
+        logger.info(f"Initialized LLM provider: {self.provider_type} with model: {self.model}")
     
     async def generate(
         self,
@@ -37,7 +43,7 @@ class LLMWrapper:
         max_tokens: int = None,
         stream: bool = False
     ) -> str | AsyncGenerator[str, None]:
-        """Generate response from LLM"""
+        """Generate response from LLM using configured provider"""
         temperature = temperature or settings.LLM_TEMPERATURE
         max_tokens = max_tokens or settings.LLM_MAX_TOKENS
         
@@ -46,90 +52,12 @@ class LLMWrapper:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
         
-        if stream:
-            return self._generate_stream(messages, temperature, max_tokens)
-        else:
-            return await self._generate_complete(messages, temperature, max_tokens)
-    
-    async def _generate_complete(
-        self,
-        messages: list,
-        temperature: float,
-        max_tokens: int
-    ) -> str:
-        """Generate complete response"""
         try:
-            # Support for Ollama API format
-            payload = {
-                "model": self.model,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-                "stream": False
-            }
-            
-            headers = {"Content-Type": "application/json"}
-            if self.api_key:
-                headers["Authorization"] = f"Bearer {self.api_key}"
-            
-            response = await self.client.post(
-                f"{self.api_url}/v1/chat/completions",
-                json=payload,
-                headers=headers
-            )
-            response.raise_for_status()
-            
-            result = response.json()
-            return result["choices"][0]["message"]["content"]
-        
+            return await self.provider.generate(messages, temperature, max_tokens, stream)
         except Exception as e:
-            logger.error(f"LLM generation failed: {e}")
+            logger.error(f"LLM generation failed with provider {self.provider_type}: {e}")
             raise
     
-    async def _generate_stream(
-        self,
-        messages: list,
-        temperature: float,
-        max_tokens: int
-    ) -> AsyncGenerator[str, None]:
-        """Generate streaming response"""
-        try:
-            payload = {
-                "model": self.model,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-                "stream": True
-            }
-            
-            headers = {"Content-Type": "application/json"}
-            if self.api_key:
-                headers["Authorization"] = f"Bearer {self.api_key}"
-            
-            async with self.client.stream(
-                "POST",
-                f"{self.api_url}/v1/chat/completions",
-                json=payload,
-                headers=headers
-            ) as response:
-                response.raise_for_status()
-                async for line in response.aiter_lines():
-                    if line.startswith("data: "):
-                        data = line[6:]
-                        if data == "[DONE]":
-                            break
-                        try:
-                            chunk = json.loads(data)
-                            if "choices" in chunk and len(chunk["choices"]) > 0:
-                                delta = chunk["choices"][0].get("delta", {})
-                                if "content" in delta:
-                                    yield delta["content"]
-                        except json.JSONDecodeError:
-                            continue
-        
-        except Exception as e:
-            logger.error(f"LLM streaming failed: {e}")
-            raise
     
     async def generate_plan(self, description: str, requirements: list = None) -> Dict[str, Any]:
         """Generate a build plan from description"""
@@ -208,7 +136,7 @@ Rules:
     
     async def close(self):
         """Close HTTP client"""
-        await self.client.aclose()
+        await self.provider.close()
 
 
 # Global LLM instance

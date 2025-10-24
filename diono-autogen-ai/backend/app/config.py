@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:4000"]
     
     # LLM Configuration
+    LLM_PROVIDER: str = "ollama"  # openai, ollama, gemini, huggingface, qwen, deepseek, anthropic, groq, together, openrouter
     LLM_MODEL: str = "mistral-7b-instruct"
     LLM_API_URL: str = "http://localhost:11434"
     LLM_API_KEY: Optional[str] = None
