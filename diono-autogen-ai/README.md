@@ -19,26 +19,23 @@ DionoAutogen AI is a fully autonomous coding platform that translates plain-Engl
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Docker & Docker Compose
-- Node.js 18+ (for local frontend development)
-- Python 3.10+ (for local backend development)
-
-### Using Docker Compose (Recommended)
+### Local Installation
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd diono-autogen-ai
-
-# Start all services
-docker-compose up -d
-
-# Access the platform
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
+# Clone and start
+git clone https://github.com/Joshua1476/DeepAnalyze.git
+cd DeepAnalyze/diono-autogen-ai
+./start.sh
 ```
+
+Visit `http://localhost:3000` and login with `demo`/`demo`.
+
+### 📚 Comprehensive Guides
+
+- **[Installation Guide](INSTALLATION_GUIDE.md)** - Complete setup for macOS, Windows, and Linux
+- **[Free Hosting Guide](FREE_HOSTING_GUIDE.md)** - Deploy to Railway, Render, Fly.io, and more
+- **[Setup Guide](SETUP.md)** - Detailed configuration and usage
+- **[Media Processing](MEDIA_PROCESSING.md)** - Image OCR and video transcription guide
 
 ### Manual Setup
 
@@ -62,17 +59,20 @@ npm run dev
 
 ```
 diono-autogen-ai/
-├── backend/              # FastAPI backend
+├── backend/                      # FastAPI backend
 │   ├── app/
 │   │   ├── main.py              # Main API
 │   │   ├── sandbox_runner.py    # Code execution (non-blocking)
-│   │   ├── media_processor.py   # Image/Video processing (NEW!)
+│   │   ├── media_processor.py   # Image/Video processing
 │   │   ├── llm_wrapper.py       # LLM integration
 │   │   └── ...
 │   └── requirements.txt
-├── frontend/             # React frontend
-├── scripts/              # Execution scripts
-├── MEDIA_PROCESSING.md   # Media processing guide (NEW!)
+├── frontend/                     # React frontend
+├── scripts/                      # Execution scripts
+├── INSTALLATION_GUIDE.md         # Cross-platform installation (NEW!)
+├── FREE_HOSTING_GUIDE.md         # Free hosting platforms (NEW!)
+├── MEDIA_PROCESSING.md           # Media processing guide
+├── SETUP.md                      # Detailed setup guide
 └── docker-compose.yml
 ```
 
@@ -158,6 +158,19 @@ flake8 app/
 npm run lint
 npm run format
 ```
+
+## 🌐 Deployment Options
+
+### Local Development
+- ✅ Works on macOS (Intel & Apple Silicon), Windows, Linux
+- ✅ Optimized for 16GB RAM / 500GB SSD
+- ✅ See [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)
+
+### Free Hosting Platforms
+- **Railway** - Easiest for beginners
+- **Render** - Generous free tier
+- **Fly.io** - Docker-native, multiple regions
+- **See [FREE_HOSTING_GUIDE.md](FREE_HOSTING_GUIDE.md)** for step-by-step instructions
 
 ## 🤝 Contributing
 
