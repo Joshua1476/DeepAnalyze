@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: diono-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+      - workspace:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock  # For sandbox execution
+    environment:
+      - DEBUG=false
+      - WORKSPACE_DIR=/workspace
+      - LLM_API_URL=http://ollama:11434
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+      - ollama
+    networks:
+      - diono-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: diono-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - diono-network
+    restart: unless-stopped
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: diono-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - diono-network
+    restart: unless-stopped
+
+  # Ollama for local LLM inference
+  ollama:
+    image: ollama/ollama:latest
+    container_name: diono-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - diono-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  workspace:
+    driver: local
+  redis-data:
+    driver: local
+  ollama-data:
+    driver: local
+
+networks:
+  diono-network:
+    driver: bridge

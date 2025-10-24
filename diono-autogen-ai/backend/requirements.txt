@@ -1,0 +1,51 @@
+# Core Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+websockets==12.0
+
+# Database & Storage
+sqlalchemy==2.0.25
+alembic==1.13.1
+redis==5.0.1
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.0
+cryptography==42.0.0
+
+# LLM Integration
+openai==1.10.0
+anthropic==0.8.1
+requests==2.31.0
+httpx==0.26.0
+
+# Cloud Storage
+google-api-python-client==2.116.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.0
+dropbox==11.36.2
+
+# Code Execution & Sandboxing
+docker==7.0.0
+subprocess32==3.5.4; python_version < '3.0'
+
+# Data Processing
+pandas==2.2.0
+numpy==1.26.3
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Utilities
+aiofiles==23.2.1
+python-magic==0.4.27
+tenacity==8.2.3
+loguru==0.7.2
+
+# Development
+pytest==7.4.4
+pytest-asyncio==0.23.3
+black==24.1.1
+flake8==7.0.0
+mypy==1.8.0
