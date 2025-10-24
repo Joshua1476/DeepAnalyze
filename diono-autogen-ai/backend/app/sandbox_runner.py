@@ -10,6 +10,8 @@ from loguru import logger
 from .config import settings
 from .models import CodeExecutionResponse
 import time
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 
 class SandboxRunner:
@@ -18,10 +20,13 @@ class SandboxRunner:
     def __init__(self):
         try:
             self.client = docker.from_env()
+            # Thread pool for non-blocking execution
+            self.executor = ThreadPoolExecutor(max_workers=4)
             logger.info("Docker client initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize Docker client: {e}")
             self.client = None
+            self.executor = None
     
     def _get_image_for_language(self, language: str) -> str:
         """Get Docker image for programming language"""
@@ -75,14 +80,14 @@ class SandboxRunner:
         }
         return extensions.get(language.lower(), ".py")
     
-    async def execute(
+    def _execute_sync(
         self,
         code: str,
-        language: str = "python",
-        timeout: int = None,
-        workspace: Optional[str] = None
+        language: str,
+        timeout: int,
+        workspace: Optional[str]
     ) -> CodeExecutionResponse:
-        """Execute code in sandbox"""
+        """Synchronous execution logic (runs in thread pool)"""
         if not self.client:
             return CodeExecutionResponse(
                 success=False,
@@ -91,7 +96,6 @@ class SandboxRunner:
                 execution_time=0.0
             )
         
-        timeout = timeout or settings.MAX_EXECUTION_TIME
         start_time = time.time()
         
         try:
@@ -184,6 +188,28 @@ class SandboxRunner:
                 error=str(e),
                 execution_time=execution_time
             )
+    
+    async def execute(
+        self,
+        code: str,
+        language: str = "python",
+        timeout: int = None,
+        workspace: Optional[str] = None
+    ) -> CodeExecutionResponse:
+        """Execute code in sandbox (non-blocking)"""
+        timeout = timeout or settings.MAX_EXECUTION_TIME
+        
+        # Run blocking Docker operations in thread pool
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            self.executor,
+            self._execute_sync,
+            code,
+            language,
+            timeout,
+            workspace
+        )
+        return result
     
     def cleanup(self):
         """Cleanup Docker resources"""

@@ -6,6 +6,7 @@ from typing import List, Dict, Any, Optional
 import json
 import pandas as pd
 from loguru import logger
+from .media_processor import media_processor
 
 
 class DocumentIngestion:
@@ -17,7 +18,9 @@ class DocumentIngestion:
             'code': ['.py', '.js', '.java', '.go', '.rs', '.cpp', '.c', '.h'],
             'data': ['.csv', '.json', '.xlsx', '.xls', '.parquet'],
             'config': ['.yaml', '.yml', '.toml', '.ini', '.conf'],
-            'document': ['.pdf', '.docx', '.doc']
+            'document': ['.pdf', '.docx', '.doc'],
+            'image': ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.webp', '.svg'],
+            'video': ['.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.webm']
         }
     
     def get_file_type(self, file_path: Path) -> str:
@@ -67,6 +70,17 @@ class DocumentIngestion:
         try:
             if file_type in ['text', 'code', 'config']:
                 result['content'] = self.read_text_file(file_path)
+            
+            elif file_type in ['image', 'video']:
+                # Process media files
+                media_result = media_processor.process_media(file_path)
+                if media_result['success']:
+                    result['content'] = media_result['transcript']
+                    result['metadata']['media_type'] = media_result['file_type']
+                else:
+                    result['error'] = media_result['error']
+                    result['success'] = False
+                    return result
             
             elif file_type == 'data':
                 ext = file_path.suffix.lower()

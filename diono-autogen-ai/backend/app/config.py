@@ -64,8 +64,25 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
+def validate_llm_url():
+    """Validate LLM API URL and warn if misconfigured"""
+    if "/v1" in settings.LLM_API_URL:
+        import warnings
+        warnings.warn(
+            f"LLM_API_URL contains '/v1' path: {settings.LLM_API_URL}\n"
+            "The system will append '/v1/chat/completions' automatically.\n"
+            "This may cause double '/v1/v1' in the URL.\n"
+            "Please remove '/v1' from LLM_API_URL in your .env file.",
+            UserWarning
+        )
+
+
 def get_workspace_path(project_name: str) -> str:
     """Get workspace path for a project"""
     workspace = os.path.join(settings.WORKSPACE_DIR, project_name)
     os.makedirs(workspace, exist_ok=True)
     return workspace
+
+
+# Validate configuration on import
+validate_llm_url()

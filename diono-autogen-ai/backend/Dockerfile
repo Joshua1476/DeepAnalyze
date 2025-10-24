@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libmagic1 \
+    tesseract-ocr \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements

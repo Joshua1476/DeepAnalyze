@@ -107,3 +107,18 @@ class ProjectInfo(BaseModel):
     status: TaskStatus
     files: List[str]
     size_mb: float
+
+
+class MediaProcessRequest(BaseModel):
+    """Request to process media file"""
+    file_path: Optional[str] = Field(default=None, description="Local file path")
+    file_url: Optional[str] = Field(default=None, description="URL to media file")
+    project_name: str = Field(..., description="Project workspace")
+
+
+class MediaProcessResponse(BaseModel):
+    """Media processing result"""
+    success: bool
+    file_type: Optional[str] = None
+    transcript: str
+    error: Optional[str] = None

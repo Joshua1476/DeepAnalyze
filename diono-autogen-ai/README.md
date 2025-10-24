@@ -7,9 +7,13 @@ DionoAutogen AI is a fully autonomous coding platform that translates plain-Engl
 ## 🌟 Features
 
 - **Autonomous Planning**: Translates natural language into concrete build plans
-- **Multi-Language Support**: Python, JavaScript, Java, Go, Rust, and more
-- **Secure Sandbox Execution**: Docker-based isolated code execution
+- **Multi-Language Support**: Python, JavaScript, Java, Go, Rust, TypeScript, Ruby, PHP
+- **Secure Sandbox Execution**: Docker-based isolated code execution with thread pool
 - **Cloud Integration**: Google Drive, Dropbox, OneDrive support
+- **Media Processing**: 
+  - **Image OCR**: Extract text from images (PNG, JPG, GIF, BMP, TIFF, WEBP, SVG)
+  - **Video Transcription**: Speech-to-text from videos (MP4, AVI, MOV, MKV, etc.)
+  - **URL Support**: Process media from URLs or local files
 - **Real-Time Updates**: WebSocket-based progress tracking
 - **Open Source**: 100% free and open-source stack
 
@@ -58,9 +62,17 @@ npm run dev
 
 ```
 diono-autogen-ai/
-├── backend/          # FastAPI backend
-├── frontend/         # React frontend
-├── scripts/          # Execution scripts
+├── backend/              # FastAPI backend
+│   ├── app/
+│   │   ├── main.py              # Main API
+│   │   ├── sandbox_runner.py    # Code execution (non-blocking)
+│   │   ├── media_processor.py   # Image/Video processing (NEW!)
+│   │   ├── llm_wrapper.py       # LLM integration
+│   │   └── ...
+│   └── requirements.txt
+├── frontend/             # React frontend
+├── scripts/              # Execution scripts
+├── MEDIA_PROCESSING.md   # Media processing guide (NEW!)
 └── docker-compose.yml
 ```
 
@@ -90,10 +102,36 @@ Once running, visit `http://localhost:8000/docs` for interactive API documentati
 
 ### Key Endpoints
 
+**Core Features:**
 - `POST /api/plan` - Generate build plan from description
-- `POST /api/run` - Execute code in sandbox
+- `POST /api/run` - Execute code in sandbox (non-blocking)
 - `POST /api/deploy` - Deploy application
+- `POST /api/upload` - Upload files (auto-processes media)
+- `POST /api/process-media` - Process image/video for transcription
+- `GET /api/projects` - List all projects
+- `GET /api/projects/{name}` - Get project details
 - `WS /ws/{session_id}` - WebSocket for real-time updates
+
+**Media Processing:**
+```bash
+# Process image from URL
+curl -X POST http://localhost:8000/api/process-media \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_url": "https://example.com/image.png",
+    "project_name": "my-project"
+  }'
+
+# Process local video
+curl -X POST http://localhost:8000/api/process-media \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_path": "video.mp4",
+    "project_name": "my-project"
+  }'
+```
 
 ## 🛠️ Development
 

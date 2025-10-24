@@ -28,7 +28,29 @@ Complete setup instructions for the DionoAutogen AI platform.
    # Or download from: https://stedolan.github.io/jq/download/
    ```
 
-2. **NVIDIA Docker (Optional, for GPU support)**
+3. **Tesseract OCR (for image text extraction)**
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install tesseract-ocr
+   
+   # macOS
+   brew install tesseract
+   
+   # Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki
+   ```
+
+4. **FFmpeg (for video processing)**
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install ffmpeg
+   
+   # macOS
+   brew install ffmpeg
+   
+   # Windows: Download from https://ffmpeg.org/download.html
+   ```
+
+5. **NVIDIA Docker (Optional, for GPU support)**
    ```bash
    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -

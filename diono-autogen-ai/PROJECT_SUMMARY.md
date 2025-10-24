@@ -56,18 +56,18 @@
 
 ## 📊 Project Statistics
 
-### Files Created: 40+
-- Backend Python files: 9
+### Files Created: 44+
+- Backend Python files: 10 (including media_processor.py)
 - Frontend React files: 11
 - Configuration files: 8
 - Documentation files: 6
 - Scripts: 6
 
-### Lines of Code: 5,000+
-- Backend: ~2,000 lines
+### Lines of Code: 5,500+
+- Backend: ~2,400 lines (including media processing)
 - Frontend: ~1,500 lines
 - Configuration: ~500 lines
-- Documentation: ~1,000 lines
+- Documentation: ~1,100 lines
 
 ## 🚀 Key Features
 
@@ -78,29 +78,41 @@
 - Time estimation
 
 ### 2. Code Execution
-- Secure sandboxed environment
-- Multi-language support
+- Secure sandboxed environment (non-blocking with thread pool)
+- Multi-language support (Python, JS, Java, Go, Rust, TypeScript, Ruby, PHP)
 - Real-time output streaming
 - Error handling and debugging
+- Optimized for high concurrency
 
-### 3. Cloud Integration
+### 3. Media Processing (NEW!)
+- **Image OCR**: Extract text from images using Tesseract
+  - Supports: PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP, SVG
+  - Automatic metadata extraction
+- **Video Transcription**: Speech-to-text from videos
+  - Supports: MP4, AVI, MOV, MKV, FLV, WMV, WEBM
+  - Automatic audio extraction and transcription
+- **URL Support**: Process media from URLs or local files
+- **Auto-Processing**: Uploaded media files are automatically processed
+
+### 4. Cloud Integration
 - Google Drive file access
 - Dropbox integration
-- OneDrive support
+- OneDrive support (framework ready)
 - Encrypted credential storage
 
-### 4. Real-Time Collaboration
+### 5. Real-Time Collaboration
 - WebSocket-based updates
 - Live code execution feedback
 - Status notifications
 - Progress tracking
 
-### 5. Security
+### 6. Security
 - JWT authentication
 - Encrypted data storage
 - Docker isolation
 - Resource limits
 - CORS protection
+- Non-blocking execution prevents DoS
 
 ## 🏗️ Architecture Highlights
 

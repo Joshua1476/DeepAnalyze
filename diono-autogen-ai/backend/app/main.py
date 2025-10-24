@@ -17,7 +17,8 @@ from .models import (
     BuildPlanRequest, BuildPlanResponse,
     CodeExecutionRequest, CodeExecutionResponse,
     DeploymentRequest, DeploymentResponse,
-    WebSocketMessage, TaskStatus, ProjectInfo
+    WebSocketMessage, TaskStatus, ProjectInfo,
+    MediaProcessRequest, MediaProcessResponse
 )
 from .llm_wrapper import llm
 from .sandbox_runner import sandbox
@@ -25,6 +26,7 @@ from .ingestion import ingestion
 from .auth import get_current_user, authenticate_user, create_access_token
 from .cloud_drives import get_cloud_client
 from .models import CloudProvider
+from .media_processor import media_processor
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -210,11 +212,21 @@ async def upload_files(
             content = await file.read()
             file_path.write_bytes(content)
             
-            uploaded_files.append({
+            # Check if it's a media file and process it
+            file_info = {
                 "name": file.filename,
                 "size": len(content),
                 "path": str(file_path.relative_to(workspace))
-            })
+            }
+            
+            # Process media files automatically
+            if media_processor.is_image(file_path) or media_processor.is_video(file_path):
+                media_result = media_processor.process_media(file_path)
+                if media_result['success']:
+                    file_info['transcript'] = media_result['transcript']
+                    file_info['media_type'] = media_result['file_type']
+            
+            uploaded_files.append(file_info)
         
         return {
             "success": True,
@@ -288,6 +300,45 @@ async def list_projects(current_user: dict = Depends(get_current_user)):
     
     except Exception as e:
         logger.error(f"Failed to list projects: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Media processing endpoint
+@app.post(f"{settings.API_PREFIX}/process-media", response_model=MediaProcessResponse)
+async def process_media(
+    request: MediaProcessRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Process image or video file and extract transcript"""
+    try:
+        logger.info(f"Processing media for project: {request.project_name}")
+        
+        workspace = get_workspace_path(request.project_name)
+        
+        # Determine if it's a local file or URL
+        if request.file_url:
+            # Process from URL
+            result = media_processor.process_media(Path(request.file_url), is_url=True)
+        elif request.file_path:
+            # Process local file
+            file_path = Path(workspace) / request.file_path
+            if not file_path.exists():
+                raise HTTPException(status_code=404, detail="File not found")
+            result = media_processor.process_media(file_path)
+        else:
+            raise HTTPException(status_code=400, detail="Either file_path or file_url must be provided")
+        
+        return MediaProcessResponse(
+            success=result['success'],
+            file_type=result.get('file_type'),
+            transcript=result.get('transcript', ''),
+            error=result.get('error')
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Media processing failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
