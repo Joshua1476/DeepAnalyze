@@ -139,48 +139,48 @@ class SandboxRunner:
             if workspace:
                 host_workspace = self._get_host_path(workspace)
                 volumes[host_workspace] = {"bind": "/data", "mode": "rw"}
+            
+            # Run container (remove=False to safely capture logs)
+            container = self.client.containers.run(
+                image,
+                command=command,
+                volumes=volumes,
+                working_dir="/workspace",
+                mem_limit=settings.SANDBOX_MEMORY_LIMIT,
+                cpu_quota=int(settings.SANDBOX_CPU_LIMIT * 100000),
+                network_disabled=not settings.SANDBOX_NETWORK_ENABLED,
+                detach=True,
+                remove=False  # Don't auto-remove to avoid log retrieval race
+            )
+            
+            # Wait for completion with timeout
+            try:
+                result = container.wait(timeout=timeout)
+                logs = container.logs().decode('utf-8')
                 
-                # Run container (remove=False to safely capture logs)
-                container = self.client.containers.run(
-                    image,
-                    command=command,
-                    volumes=volumes,
-                    working_dir="/workspace",
-                    mem_limit=settings.SANDBOX_MEMORY_LIMIT,
-                    cpu_quota=int(settings.SANDBOX_CPU_LIMIT * 100000),
-                    network_disabled=not settings.SANDBOX_NETWORK_ENABLED,
-                    detach=True,
-                    remove=False  # Don't auto-remove to avoid log retrieval race
-                )
-                
-                # Wait for completion with timeout
+                # Clean up container after capturing logs
                 try:
-                    result = container.wait(timeout=timeout)
-                    logs = container.logs().decode('utf-8')
-                    
-                    # Clean up container after capturing logs
-                    try:
-                        container.remove()
-                    except:
-                        pass
-                    
-                    execution_time = time.time() - start_time
-                    
-                    if result['StatusCode'] == 0:
-                        return CodeExecutionResponse(
-                            success=True,
-                            output=logs,
-                            error=None,
-                            execution_time=execution_time
-                        )
-                    else:
-                        return CodeExecutionResponse(
-                            success=False,
-                            output=logs,
-                            error=f"Exit code: {result['StatusCode']}",
-                            execution_time=execution_time
-                        )
+                    container.remove()
+                except:
+                    pass
                 
+                execution_time = time.time() - start_time
+                
+                if result['StatusCode'] == 0:
+                    return CodeExecutionResponse(
+                        success=True,
+                        output=logs,
+                        error=None,
+                        execution_time=execution_time
+                    )
+                else:
+                    return CodeExecutionResponse(
+                        success=False,
+                        output=logs,
+                        error=f"Exit code: {result['StatusCode']}",
+                        execution_time=execution_time
+                    )
+            
             except Exception as e:
                 # Timeout or other error
                 try:

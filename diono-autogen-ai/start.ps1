@@ -20,6 +20,11 @@ try {
 Write-Host ""
 Write-Host "Starting services..." -ForegroundColor Yellow
 
+# Set HOST_WORKSPACE_PATH for Docker-in-Docker volume mounting
+$workspacePath = Join-Path (Get-Location) "workspace"
+$env:HOST_WORKSPACE_PATH = $workspacePath
+Write-Host "Workspace path: $workspacePath" -ForegroundColor Cyan
+
 # Try Docker Compose v2 first, fall back to v1
 Write-Host "Checking Docker Compose version..." -ForegroundColor Yellow
 $composeCmd = $null

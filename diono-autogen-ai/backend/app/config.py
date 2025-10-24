@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     
     # LLM Configuration
     LLM_PROVIDER: str = "ollama"  # openai, ollama, gemini, huggingface, qwen, deepseek, anthropic, groq, together, openrouter
-    LLM_MODEL: str = "mistral-7b-instruct"
+    LLM_MODEL: str = "mistral:instruct"
     LLM_API_URL: str = "http://localhost:11434"
     LLM_API_KEY: Optional[str] = None
     LLM_TEMPERATURE: float = 0.7

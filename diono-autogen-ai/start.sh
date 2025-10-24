@@ -53,6 +53,10 @@ echo ""
 echo "Starting services..."
 echo ""
 
+# Set HOST_WORKSPACE_PATH for Docker-in-Docker volume mounting
+export HOST_WORKSPACE_PATH="$(pwd)/workspace"
+echo "Workspace path: $HOST_WORKSPACE_PATH"
+
 # Start services using detected compose command
 $COMPOSE_CMD up -d
 

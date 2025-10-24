@@ -17,7 +17,7 @@ services:
       - DEBUG=false
       - WORKSPACE_DIR=/workspace
       - LLM_API_URL=http://ollama:11434
-      - HOST_WORKSPACE_PATH=${PWD}/workspace  # Host path for Docker-in-Docker
+      - HOST_WORKSPACE_PATH=${HOST_WORKSPACE_PATH:-/tmp/workspace}  # Host path for Docker-in-Docker (set by start scripts)
     env_file:
       - ./backend/.env  # Load environment variables from .env file
     depends_on:
