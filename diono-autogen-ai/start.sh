@@ -46,8 +46,18 @@ echo ""
 echo "Starting services..."
 echo ""
 
-# Start services
-docker-compose up -d
+# Try Docker Compose v2 first, fall back to v1
+if docker compose version > /dev/null 2>&1; then
+    echo "Using Docker Compose v2"
+    docker compose up -d
+elif docker-compose version > /dev/null 2>&1; then
+    echo "Using Docker Compose v1"
+    docker-compose up -d
+else
+    echo "❌ Docker Compose not found"
+    echo "Please install Docker Compose"
+    exit 1
+fi
 
 echo ""
 echo "Waiting for services to be ready..."

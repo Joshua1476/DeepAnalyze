@@ -226,7 +226,13 @@ class DeepSeekProvider(BaseLLMProvider):
 
 
 def get_provider(provider_type: str, api_url: str, api_key: Optional[str] = None) -> BaseLLMProvider:
-    """Factory function to get the appropriate provider"""
+    """Factory function to get the appropriate provider
+    
+    Note: Some providers require OpenAI-compatible endpoints:
+    - anthropic: Use via OpenRouter or similar gateway (not direct Anthropic API)
+    - groq, together, openrouter: Native OpenAI-compatible APIs
+    - qwen, deepseek: Native OpenAI-compatible APIs
+    """
     providers = {
         "openai": OpenAIProvider,
         "ollama": OllamaProvider,
@@ -234,10 +240,10 @@ def get_provider(provider_type: str, api_url: str, api_key: Optional[str] = None
         "huggingface": HuggingFaceProvider,
         "qwen": QwenProvider,
         "deepseek": DeepSeekProvider,
-        "anthropic": OpenAIProvider,  # Anthropic is OpenAI-compatible
-        "groq": OpenAIProvider,  # Groq is OpenAI-compatible
-        "together": OpenAIProvider,  # Together is OpenAI-compatible
-        "openrouter": OpenAIProvider,  # OpenRouter is OpenAI-compatible
+        "anthropic": OpenAIProvider,  # Via OpenRouter or compatible gateway only
+        "groq": OpenAIProvider,  # Native OpenAI-compatible
+        "together": OpenAIProvider,  # Native OpenAI-compatible
+        "openrouter": OpenAIProvider,  # Native OpenAI-compatible
     }
     
     provider_class = providers.get(provider_type.lower(), OpenAIProvider)

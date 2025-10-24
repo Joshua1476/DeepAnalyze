@@ -20,8 +20,28 @@ try {
 Write-Host ""
 Write-Host "Starting services..." -ForegroundColor Yellow
 
-# Start Docker Compose
-docker-compose up -d
+# Try Docker Compose v2 first, fall back to v1
+Write-Host "Checking Docker Compose version..." -ForegroundColor Yellow
+$composeCmd = $null
+
+try {
+    docker compose version | Out-Null
+    $composeCmd = "docker compose"
+    Write-Host "Using Docker Compose v2" -ForegroundColor Green
+} catch {
+    try {
+        docker-compose version | Out-Null
+        $composeCmd = "docker-compose"
+        Write-Host "Using Docker Compose v1" -ForegroundColor Green
+    } catch {
+        Write-Host "✗ Docker Compose not found" -ForegroundColor Red
+        Write-Host "Please install Docker Desktop which includes Docker Compose" -ForegroundColor Yellow
+        exit 1
+    }
+}
+
+# Start services
+& $composeCmd up -d
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""

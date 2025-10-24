@@ -192,13 +192,19 @@ Copy-Item frontend\.env.example frontend\.env
 ### Step 7: Start the Application
 
 ```powershell
-# Start all services
-.\start.sh
+# Start all services (PowerShell script)
+.\start.ps1
 ```
 
 **Note**: If you get an error about execution policy, run:
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Alternative**: If you prefer using bash, you can use Git Bash or WSL:
+```bash
+# In Git Bash or WSL
+./start.sh
 ```
 
 ### Step 8: Access the Application
