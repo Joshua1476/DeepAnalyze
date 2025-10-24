@@ -42,17 +42,15 @@ echo "Project: $PROJECT_NAME"
 echo "Task: $TASK_DESCRIPTION"
 echo ""
 
-# Generate build plan
+# Generate build plan (using jq for proper JSON escaping)
 echo "Generating build plan..."
 PLAN_RESPONSE=$(curl -s -X POST http://localhost:8000/api/plan \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
-    -d "{
-        \"description\": \"$TASK_DESCRIPTION\",
-        \"project_name\": \"$PROJECT_NAME\",
-        \"requirements\": [],
-        \"tech_stack\": []
-    }")
+    -d "$(jq -n \
+        --arg desc "$TASK_DESCRIPTION" \
+        --arg project "$PROJECT_NAME" \
+        '{description: $desc, project_name: $project, requirements: [], tech_stack: []}')")
 
 echo "Build plan generated!"
 echo "$PLAN_RESPONSE" | jq '.'

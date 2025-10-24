@@ -47,17 +47,16 @@ for project in "${PROJECTS[@]}"; do
     # Create workspace
     mkdir -p "$PROJECT_ROOT/workspace/$name"
     
-    # Generate plan
+    # Generate plan (using jq for proper JSON escaping)
     echo "Generating build plan..."
     curl -s -X POST http://localhost:8000/api/plan \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TOKEN" \
-        -d "{
-            \"description\": \"$description\",
-            \"project_name\": \"$name\",
-            \"requirements\": [],
-            \"tech_stack\": []
-        }" > "$PROJECT_ROOT/workspace/$name/build_plan.json"
+        -d "$(jq -n \
+            --arg desc "$description" \
+            --arg project "$name" \
+            '{description: $desc, project_name: $project, requirements: [], tech_stack: []}')" \
+        > "$PROJECT_ROOT/workspace/$name/build_plan.json"
     
     echo "✓ Plan generated for $name"
     echo ""
