@@ -33,8 +33,10 @@ if [ -z "$TOKEN" ]; then
     exit 1
 fi
 
-# Create project workspace
-mkdir -p ../workspace/$PROJECT_NAME
+# Create project workspace (relative to project root)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+mkdir -p "$PROJECT_ROOT/workspace/$PROJECT_NAME"
 
 echo "Project: $PROJECT_NAME"
 echo "Task: $TASK_DESCRIPTION"
@@ -56,7 +58,7 @@ echo "Build plan generated!"
 echo "$PLAN_RESPONSE" | jq '.'
 
 # Save plan to file
-echo "$PLAN_RESPONSE" > ../workspace/$PROJECT_NAME/build_plan.json
+echo "$PLAN_RESPONSE" > "$PROJECT_ROOT/workspace/$PROJECT_NAME/build_plan.json"
 
 echo ""
 echo "Build plan saved to workspace/$PROJECT_NAME/build_plan.json"

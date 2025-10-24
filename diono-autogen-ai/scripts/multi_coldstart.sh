@@ -34,6 +34,10 @@ fi
 echo "Initializing ${#PROJECTS[@]} projects..."
 echo ""
 
+# Get script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 for project in "${PROJECTS[@]}"; do
     IFS=':' read -r name description <<< "$project"
     
@@ -41,7 +45,7 @@ for project in "${PROJECTS[@]}"; do
     echo "Description: $description"
     
     # Create workspace
-    mkdir -p ../workspace/$name
+    mkdir -p "$PROJECT_ROOT/workspace/$name"
     
     # Generate plan
     echo "Generating build plan..."
@@ -53,7 +57,7 @@ for project in "${PROJECTS[@]}"; do
             \"project_name\": \"$name\",
             \"requirements\": [],
             \"tech_stack\": []
-        }" > ../workspace/$name/build_plan.json
+        }" > "$PROJECT_ROOT/workspace/$name/build_plan.json"
     
     echo "✓ Plan generated for $name"
     echo ""

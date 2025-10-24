@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app
-      - workspace:/workspace
+      - ./workspace:/workspace  # Bind mount for consistent workspace access
       - /var/run/docker.sock:/var/run/docker.sock  # For sandbox execution
     environment:
       - DEBUG=false
@@ -65,17 +65,12 @@ services:
     networks:
       - diono-network
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    # GPU support (uncomment if you have NVIDIA GPU and nvidia-docker installed)
+    # runtime: nvidia
+    # environment:
+    #   - NVIDIA_VISIBLE_DEVICES=all
 
 volumes:
-  workspace:
-    driver: local
   redis-data:
     driver: local
   ollama-data:

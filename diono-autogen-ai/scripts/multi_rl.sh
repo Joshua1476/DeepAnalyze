@@ -34,8 +34,12 @@ if [ -z "$TOKEN" ]; then
     exit 1
 fi
 
+# Get script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 # Create workspace
-mkdir -p ../workspace/$PROJECT_NAME
+mkdir -p "$PROJECT_ROOT/workspace/$PROJECT_NAME"
 
 for i in $(seq 1 $ITERATIONS); do
     echo "=== Iteration $i/$ITERATIONS ==="
@@ -59,7 +63,7 @@ print('Testing RL mode')"
     echo "$RESULT" | jq '.'
     
     # Save iteration results
-    echo "$RESULT" > ../workspace/$PROJECT_NAME/iteration_$i.json
+    echo "$RESULT" > "$PROJECT_ROOT/workspace/$PROJECT_NAME/iteration_$i.json"
     
     echo ""
     sleep 2

@@ -61,14 +61,16 @@ class ConnectionManager:
     async def send_message(self, session_id: str, message: WebSocketMessage):
         if session_id in self.active_connections:
             try:
-                await self.active_connections[session_id].send_json(message.dict())
+                # Use model_dump with mode="json" for proper datetime serialization
+                await self.active_connections[session_id].send_json(message.model_dump(mode="json"))
             except Exception as e:
                 logger.error(f"Failed to send message to {session_id}: {e}")
     
     async def broadcast(self, message: WebSocketMessage):
         for session_id, connection in self.active_connections.items():
             try:
-                await connection.send_json(message.dict())
+                # Use model_dump with mode="json" for proper datetime serialization
+                await connection.send_json(message.model_dump(mode="json"))
             except Exception as e:
                 logger.error(f"Failed to broadcast to {session_id}: {e}")
 
