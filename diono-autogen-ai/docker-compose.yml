@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: diono-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+      - ./workspace:/workspace  # Bind mount for consistent workspace access
+      - /var/run/docker.sock:/var/run/docker.sock  # For sandbox execution
+    environment:
+      - DEBUG=false
+      - WORKSPACE_DIR=/workspace
+      - LLM_API_URL=http://ollama:11434
+      - HOST_WORKSPACE_PATH=${HOST_WORKSPACE_PATH:-/tmp/workspace}  # Host path for Docker-in-Docker (set by start scripts)
+    env_file:
+      - ./backend/.env  # Load environment variables from .env file
+    depends_on:
+      - ollama
+    networks:
+      - diono-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # Note: VITE_* vars must be set at build time, not runtime
+      # Default values are used from .env.example during build
+    container_name: diono-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - diono-network
+    restart: unless-stopped
+
+  # Ollama for local LLM inference
+  ollama:
+    image: ollama/ollama:latest
+    container_name: diono-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - diono-network
+    restart: unless-stopped
+    # GPU support (uncomment if you have NVIDIA GPU and nvidia-docker installed)
+    # runtime: nvidia
+    # environment:
+    #   - NVIDIA_VISIBLE_DEVICES=all
+
+volumes:
+  ollama-data:
+    driver: local
+
+networks:
+  diono-network:
+    driver: bridge
