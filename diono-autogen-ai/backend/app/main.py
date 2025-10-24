@@ -344,7 +344,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     WebSocketMessage(
                         type="result",
                         message="Execution completed",
-                        data=result.dict()
+                        data=result.model_dump()
                     )
                 )
     

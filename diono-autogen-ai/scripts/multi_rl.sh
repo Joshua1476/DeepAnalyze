@@ -5,6 +5,13 @@ set -e
 
 echo "=== DionoAutogen AI - Reinforcement Learning Mode ==="
 
+# Check for required tools
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required but not installed."
+    echo "Please install jq: https://stedolan.github.io/jq/download/"
+    exit 1
+fi
+
 # This script demonstrates iterative improvement through RL
 # It executes code, evaluates results, and refines the approach
 

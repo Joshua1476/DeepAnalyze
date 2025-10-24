@@ -5,6 +5,13 @@ set -e
 
 echo "=== DionoAutogen AI - Single Task Execution ==="
 
+# Check for required tools
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required but not installed."
+    echo "Please install jq: https://stedolan.github.io/jq/download/"
+    exit 1
+fi
+
 # Check if project name is provided
 if [ -z "$1" ]; then
     echo "Usage: ./single.sh <project_name> <task_description>"

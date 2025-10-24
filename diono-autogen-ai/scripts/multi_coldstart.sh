@@ -5,6 +5,13 @@ set -e
 
 echo "=== DionoAutogen AI - Multi-Project Cold Start ==="
 
+# Check for required tools
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required but not installed."
+    echo "Please install jq: https://stedolan.github.io/jq/download/"
+    exit 1
+fi
+
 # Array of sample projects
 declare -a PROJECTS=(
     "todo-api:Create a REST API for a todo application with user authentication"

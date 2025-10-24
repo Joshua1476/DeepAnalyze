@@ -17,6 +17,17 @@ Complete setup instructions for the DionoAutogen AI platform.
    sudo chmod +x /usr/local/bin/docker-compose
    ```
 
+2. **jq (JSON processor)**
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install jq
+   
+   # macOS
+   brew install jq
+   
+   # Or download from: https://stedolan.github.io/jq/download/
+   ```
+
 2. **NVIDIA Docker (Optional, for GPU support)**
    ```bash
    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
