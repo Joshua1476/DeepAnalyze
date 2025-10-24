@@ -8,7 +8,6 @@ import tempfile
 import requests
 from PIL import Image
 import pytesseract
-import cv2
 import speech_recognition as sr
 from moviepy.editor import VideoFileClip
 from loguru import logger

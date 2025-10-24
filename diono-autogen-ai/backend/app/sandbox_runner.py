@@ -20,9 +20,9 @@ class SandboxRunner:
     def __init__(self):
         try:
             self.client = docker.from_env()
-            # Thread pool for non-blocking execution
-            self.executor = ThreadPoolExecutor(max_workers=4)
-            logger.info("Docker client initialized successfully")
+            # Thread pool for non-blocking execution (configurable size)
+            self.executor = ThreadPoolExecutor(max_workers=settings.SANDBOX_MAX_WORKERS)
+            logger.info(f"Docker client initialized with {settings.SANDBOX_MAX_WORKERS} workers")
         except Exception as e:
             logger.error(f"Failed to initialize Docker client: {e}")
             self.client = None
@@ -130,7 +130,7 @@ class SandboxRunner:
                     working_dir="/workspace",
                     mem_limit=settings.SANDBOX_MEMORY_LIMIT,
                     cpu_quota=int(settings.SANDBOX_CPU_LIMIT * 100000),
-                    network_disabled=False,  # Allow network for package installation
+                    network_disabled=not settings.SANDBOX_NETWORK_ENABLED,
                     detach=True,
                     remove=False  # Don't auto-remove to avoid log retrieval race
                 )
@@ -213,6 +213,15 @@ class SandboxRunner:
     
     def cleanup(self):
         """Cleanup Docker resources"""
+        # Shutdown thread pool
+        if self.executor:
+            try:
+                self.executor.shutdown(wait=False)
+                logger.info("Thread pool shutdown complete")
+            except Exception as e:
+                logger.error(f"Thread pool shutdown failed: {e}")
+        
+        # Cleanup Docker containers
         if self.client:
             try:
                 # Remove stopped containers

@@ -4,11 +4,6 @@ uvicorn[standard]==0.27.0
 python-multipart==0.0.6
 websockets==12.0
 
-# Database & Storage
-sqlalchemy==2.0.25
-alembic==1.13.1
-redis==5.0.1
-
 # Authentication & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
@@ -38,7 +33,6 @@ pydantic-settings==2.1.0
 # Media Processing
 pillow==10.2.0
 pytesseract==0.3.10
-opencv-python-headless==4.9.0.80
 moviepy==1.0.3
 SpeechRecognition==3.10.1
 pydub==0.25.1

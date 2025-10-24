@@ -37,17 +37,13 @@ class Settings(BaseSettings):
     MAX_EXECUTION_TIME: int = 300  # seconds
     SANDBOX_MEMORY_LIMIT: str = "2g"
     SANDBOX_CPU_LIMIT: float = 2.0
+    SANDBOX_MAX_WORKERS: int = 4  # Thread pool size for code execution
+    SANDBOX_NETWORK_ENABLED: bool = True  # Allow network access in sandbox
     
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    
-    # Database
-    DATABASE_URL: str = "sqlite:///./diono_autogen.db"
-    
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379"
     
     # Cloud Storage
     GOOGLE_DRIVE_CREDENTIALS: Optional[str] = None
