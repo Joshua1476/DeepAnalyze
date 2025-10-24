@@ -18,15 +18,22 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
+echo "✓ Docker is installed"
+
+# Detect Docker Compose version and set command
+COMPOSE_CMD=""
+if docker compose version > /dev/null 2>&1; then
+    COMPOSE_CMD="docker compose"
+    echo "✓ Docker Compose v2 detected"
+elif docker-compose version > /dev/null 2>&1; then
+    COMPOSE_CMD="docker-compose"
+    echo "✓ Docker Compose v1 detected"
+else
     echo "❌ Docker Compose is not installed. Please install Docker Compose first."
     echo "   Visit: https://docs.docker.com/compose/install/"
     exit 1
 fi
 
-echo "✓ Docker is installed"
-echo "✓ Docker Compose is installed"
 echo ""
 
 # Create environment files if they don't exist
@@ -46,25 +53,15 @@ echo ""
 echo "Starting services..."
 echo ""
 
-# Try Docker Compose v2 first, fall back to v1
-if docker compose version > /dev/null 2>&1; then
-    echo "Using Docker Compose v2"
-    docker compose up -d
-elif docker-compose version > /dev/null 2>&1; then
-    echo "Using Docker Compose v1"
-    docker-compose up -d
-else
-    echo "❌ Docker Compose not found"
-    echo "Please install Docker Compose"
-    exit 1
-fi
+# Start services using detected compose command
+$COMPOSE_CMD up -d
 
 echo ""
 echo "Waiting for services to be ready..."
 sleep 5
 
 # Check if services are running
-if docker-compose ps | grep -q "Up"; then
+if $COMPOSE_CMD ps | grep -q "Up"; then
     echo ""
     echo "╔════════════════════════════════════════════════════════════╗"
     echo "║                   🎉 Success!                              ║"
@@ -81,15 +78,15 @@ if docker-compose ps | grep -q "Up"; then
     echo "  Password: demo"
     echo ""
     echo "Useful commands:"
-    echo "  View logs:     docker-compose logs -f"
-    echo "  Stop services: docker-compose down"
-    echo "  Restart:       docker-compose restart"
+    echo "  View logs:     $COMPOSE_CMD logs -f"
+    echo "  Stop services: $COMPOSE_CMD down"
+    echo "  Restart:       $COMPOSE_CMD restart"
     echo ""
     echo "For more information, see SETUP.md"
     echo ""
 else
     echo ""
     echo "❌ Some services failed to start. Check logs with:"
-    echo "   docker-compose logs"
+    echo "   $COMPOSE_CMD logs"
     exit 1
 fi

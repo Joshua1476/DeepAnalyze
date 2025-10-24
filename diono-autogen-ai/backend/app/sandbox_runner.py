@@ -80,6 +80,15 @@ class SandboxRunner:
         }
         return extensions.get(language.lower(), ".py")
     
+    def _get_host_path(self, container_path: str) -> str:
+        """Convert container path to host path for Docker-in-Docker volume mounting"""
+        if settings.HOST_WORKSPACE_PATH and container_path.startswith(settings.WORKSPACE_DIR):
+            # Replace container workspace path with host workspace path
+            relative_path = container_path[len(settings.WORKSPACE_DIR):].lstrip('/')
+            host_path = os.path.join(settings.HOST_WORKSPACE_PATH, relative_path)
+            return host_path
+        return container_path
+    
     def _execute_sync(
         self,
         code: str,
@@ -97,30 +106,39 @@ class SandboxRunner:
             )
         
         start_time = time.time()
+        tmpdir = None
+        tmpdir_cleanup = False
         
         try:
-            # Create temporary directory for code
-            with tempfile.TemporaryDirectory() as tmpdir:
-                # Write code to file
-                ext = self._get_file_extension(language)
-                code_file = Path(tmpdir) / f"code{ext}"
-                code_file.write_text(code)
-                
-                # Get Docker image and command
-                image = self._get_image_for_language(language)
-                command = self._get_command_for_language(language, f"code{ext}")
-                
-                # Pull image if not available
-                try:
-                    self.client.images.get(image)
-                except docker.errors.ImageNotFound:
-                    logger.info(f"Pulling Docker image: {image}")
-                    self.client.images.pull(image)
-                
-                # Mount workspace if provided
-                volumes = {tmpdir: {"bind": "/workspace", "mode": "rw"}}
-                if workspace:
-                    volumes[workspace] = {"bind": "/data", "mode": "rw"}
+            # Create temporary directory for code execution
+            # Use host workspace path if available for Docker-in-Docker
+            if settings.HOST_WORKSPACE_PATH:
+                tmpdir = tempfile.mkdtemp(dir=settings.HOST_WORKSPACE_PATH)
+                tmpdir_cleanup = True
+            else:
+                tmpdir = tempfile.mkdtemp()
+                tmpdir_cleanup = True
+            # Write code to file
+            ext = self._get_file_extension(language)
+            code_file = Path(tmpdir) / f"code{ext}"
+            code_file.write_text(code)
+            
+            # Get Docker image and command
+            image = self._get_image_for_language(language)
+            command = self._get_command_for_language(language, f"code{ext}")
+            
+            # Pull image if not available
+            try:
+                self.client.images.get(image)
+            except docker.errors.ImageNotFound:
+                logger.info(f"Pulling Docker image: {image}")
+                self.client.images.pull(image)
+            
+            # Setup volumes with host paths for Docker-in-Docker
+            volumes = {tmpdir: {"bind": "/workspace", "mode": "rw"}}
+            if workspace:
+                host_workspace = self._get_host_path(workspace)
+                volumes[host_workspace] = {"bind": "/data", "mode": "rw"}
                 
                 # Run container (remove=False to safely capture logs)
                 container = self.client.containers.run(
@@ -163,21 +181,21 @@ class SandboxRunner:
                             execution_time=execution_time
                         )
                 
-                except Exception as e:
-                    # Timeout or other error
-                    try:
-                        container.stop(timeout=1)
-                        container.remove()
-                    except:
-                        pass
-                    
-                    execution_time = time.time() - start_time
-                    return CodeExecutionResponse(
-                        success=False,
-                        output="",
-                        error=f"Execution timeout or error: {str(e)}",
-                        execution_time=execution_time
-                    )
+            except Exception as e:
+                # Timeout or other error
+                try:
+                    container.stop(timeout=1)
+                    container.remove()
+                except:
+                    pass
+                
+                execution_time = time.time() - start_time
+                return CodeExecutionResponse(
+                    success=False,
+                    output="",
+                    error=f"Execution timeout or error: {str(e)}",
+                    execution_time=execution_time
+                )
         
         except Exception as e:
             logger.error(f"Sandbox execution failed: {e}")
@@ -188,6 +206,15 @@ class SandboxRunner:
                 error=str(e),
                 execution_time=execution_time
             )
+        
+        finally:
+            # Cleanup temp directory if we created it
+            if tmpdir_cleanup and tmpdir and os.path.exists(tmpdir):
+                import shutil
+                try:
+                    shutil.rmtree(tmpdir)
+                except:
+                    pass
     
     async def execute(
         self,

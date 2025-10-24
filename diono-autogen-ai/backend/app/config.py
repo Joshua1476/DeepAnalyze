@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     
     # Workspace
     WORKSPACE_DIR: str = "/workspace"
+    HOST_WORKSPACE_PATH: Optional[str] = None  # Host path for Docker-in-Docker volume mounting
     MAX_WORKSPACE_SIZE_MB: int = 1000
     
     # Execution
