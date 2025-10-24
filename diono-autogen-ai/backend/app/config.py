@@ -66,9 +66,8 @@ def validate_llm_url():
         import warnings
         warnings.warn(
             f"LLM_API_URL contains '/v1' path: {settings.LLM_API_URL}\n"
-            "The system will append '/v1/chat/completions' automatically.\n"
-            "This may cause double '/v1/v1' in the URL.\n"
-            "Please remove '/v1' from LLM_API_URL in your .env file.",
+            "The system will automatically strip '/v1' and append '/v1/chat/completions'.\n"
+            "For cleaner configuration, please remove '/v1' from LLM_API_URL in your .env file.",
             UserWarning
         )
 

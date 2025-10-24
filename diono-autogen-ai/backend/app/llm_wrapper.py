@@ -18,7 +18,14 @@ class LLMWrapper:
         api_key: Optional[str] = None
     ):
         self.model = model or settings.LLM_MODEL
-        self.api_url = api_url or settings.LLM_API_URL
+        
+        # Normalize API URL (strip trailing /v1 if present)
+        base_url = (api_url or settings.LLM_API_URL).rstrip('/')
+        if base_url.endswith('/v1'):
+            base_url = base_url[:-3]
+            logger.warning(f"Stripped /v1 from LLM_API_URL: {base_url}")
+        
+        self.api_url = base_url
         self.api_key = api_key or settings.LLM_API_KEY
         self.client = httpx.AsyncClient(timeout=300.0)
     

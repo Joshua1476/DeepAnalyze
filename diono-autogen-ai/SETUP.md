@@ -81,10 +81,17 @@ Edit `backend/.env`:
 ```bash
 # LLM Configuration
 LLM_MODEL=mistral-7b-instruct
+# ⚠️ IMPORTANT: Use base URL only, WITHOUT /v1 path
+# ✅ Correct: http://ollama:11434
+# ❌ Wrong: http://ollama:11434/v1
 LLM_API_URL=http://ollama:11434
 
 # Security (IMPORTANT: Change in production!)
 SECRET_KEY=your-super-secret-key-change-this
+
+# Sandbox Configuration
+SANDBOX_NETWORK_ENABLED=true  # Allow network access in sandbox
+SANDBOX_MAX_WORKERS=4  # Thread pool size for code execution
 
 # Optional: Add API keys for external LLM services
 # LLM_API_KEY=your-openai-api-key
