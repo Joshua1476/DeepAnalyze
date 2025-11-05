@@ -8,9 +8,14 @@
 [![model](https://img.shields.io/badge/%F0%9F%A4%97%20Huggingface%20-DeepAnalyze--8B-orange.svg)](https://huggingface.co/RUC-DataLab/DeepAnalyze-8B)
 [![data](https://img.shields.io/badge/%F0%9F%93%9A%20Datasets%20-DataScience--Instruct--500K-darkgreen.svg)](https://huggingface.co/datasets/RUC-DataLab/DataScience-Instruct-500K)
 [![star](https://img.shields.io/github/stars/ruc-datalab/DeepAnalyze?style=social&label=Code+Stars)](https://github.com/ruc-datalab/DeepAnalyze)
-![Badge](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2Fruc-datalab%2FDeepAnalyze&label=Visitors&icon=graph-up&color=%23dc3545&message=&style=flat&tz=UTC)
+![Badge](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2Fruc-datalab%2FDeepAnalyze&label=Visitors&icon=graph-up&color=%23dc3545&message=&style=flat&tz=UTC)  [![wechat](https://img.shields.io/badge/WeChat-%E5%8A%A0%E5%85%A5DeepAnalyze%E4%BA%A4%E6%B5%81%E8%AE%A8%E8%AE%BA%E7%BE%A4-black?logo=wechat&logoColor=07C160)](./assets/wechat.jpg) 
+
+[![twitter](https://img.shields.io/badge/@Brian%20Roemmele-gray?logo=x&logoColor=white&labelColor=black)](https://x.com/BrianRoemmele/status/1981015483823571352) [![twitter](https://img.shields.io/badge/@Dr%20Singularity-gray?logo=x&logoColor=white&labelColor=black)](https://x.com/Dr_Singularity/status/1981010771338498241) [![twitter](https://img.shields.io/badge/@Gorden%20Sun-gray?logo=x&logoColor=white&labelColor=black)](https://x.com/Gorden_Sun/status/1980573407386423408) [![twitter](https://img.shields.io/badge/@AIGCLINK-gray?logo=x&logoColor=white&labelColor=black)](https://x.com/aigclink/status/1980554517126246642) [![twitter](https://img.shields.io/badge/@Python%20Developer-gray?logo=x&logoColor=white&labelColor=black)](https://x.com/Python_Dv/status/1980667557318377871) [![twitter](https://img.shields.io/badge/@meng%20shao-gray?logo=x&logoColor=white&labelColor=black)](https://x.com/shao__meng/status/1980623242114314531) 
+
 
 > **Authors**: **[Shaolei Zhang](https://zhangshaolei1998.github.io/), [Ju Fan*](http://iir.ruc.edu.cn/~fanj/), [Meihao Fan](https://scholar.google.com/citations?user=9RTm2qoAAAAJ), [Guoliang Li](https://dbgroup.cs.tsinghua.edu.cn/ligl/), [Xiaoyong Du](http://info.ruc.edu.cn/jsky/szdw/ajxjgcx/jsjkxyjsx1/js2/7374b0a3f58045fc9543703ccea2eb9c.htm)**
+>
+> Renmin University of China, Tsinghua University
 
 
 **DeepAnalyze** is the first agentic LLM for autonomous data science. It can autonomously complete a wide range of data-centric tasks without human intervention, supporting:
@@ -23,8 +28,10 @@
 </p>
 
 
-> Welcome to ⭐ star DeepAnalyze. Any useful issues and pull requests will be included in contributors.
-
+## 🔥 News
+- **[2025.10.28]**: We welcome all contributions, including improving the DeepAnalyze and sharing use cases (see [`CONTRIBUTION.md`](CONTRIBUTION.md)). All merged PRs will be listed as contributors.
+- **[2025.10.27]**: DeepAnalyze has attracted widespread attention, gaining **1K+** GitHub stars and **200K+** Twitter views within a week.
+- **[2025.10.21]**: DeepAnalyze's [paper](https://arxiv.org/abs/2510.16872), [code](https://github.com/ruc-datalab/DeepAnalyze), [model](https://huggingface.co/RUC-DataLab/DeepAnalyze-8B), [training data](https://huggingface.co/datasets/RUC-DataLab/DataScience-Instruct-500K) are released!
 
 ## 🖥 Demo
 
@@ -43,6 +50,7 @@ https://github.com/user-attachments/assets/04184975-7ee7-4ae0-8761-7a7550c5c8fe
 
 
 - Clone this repo and download [DeepAnalyze-8B](https://huggingface.co/RUC-DataLab/DeepAnalyze-8B).
+- Deploy DeepAnalyze-8B via vllm: `vllm serve DeepAnalyze-8B`
 - Run these scripts to launch the API and interface, and then interact through the browser (http://localhost:4000):
     ```bash
     cd demo/chat
@@ -59,7 +67,7 @@ https://github.com/user-attachments/assets/04184975-7ee7-4ae0-8761-7a7550c5c8fe
 
 ### Requirements
 
-- Install packages: `torch==2.6.0`, `transformers==4.53.2`, `vllm==0.8.5`
+- Install packages: `torch`, `transformers`, `vllm>=0.8.5`
     ```bash
     conda create -n deepanalyze python=3.12 -y
     conda activate deepanalyze
@@ -69,6 +77,9 @@ https://github.com/user-attachments/assets/04184975-7ee7-4ae0-8761-7a7550c5c8fe
     (cd ./deepanalyze/ms-swift/ && pip install -e .)
     (cd ./deepanalyze/SkyRL/ && pip install -e .)
     ```
+- [`requirements.txt`](requirements.txt) lists the minimal dependencies required for DeepAnalyze inference.
+For training, please refer to [`./deepanalyze/ms-swift/requirements.txt`](./deepanalyze/ms-swift/requirements.txt) and [`./deepanalyze/SkyRL/pyproject.toml`](./deepanalyze/SkyRL/pyproject.toml)
+- We recommend separating the inference and training environments to avoid dependency conflicts.
 
 ### Command Interaction
 
@@ -97,7 +108,7 @@ https://github.com/user-attachments/assets/04184975-7ee7-4ae0-8761-7a7550c5c8fe
   File 9: {"name": "unemployed.xlsx", "size": "5.6KB"}
   File 10: {"name": "enrolled.csv", "size": "20.4KB"}"""
 
-  workspace = "/home/u2023000922/zhangshaolei/deepanalyze_dev/example/student_loan/"
+  workspace = "/home/u2023000922/zhangshaolei/deepanalyze_public/DeepAnalyze/example/analysis_on_student_loan/"
   
   deepanalyze = DeepAnalyzeVLLM(
       "/fs/fast/u2023000922/zhangshaolei/checkpoints/deepanalyze-8b/"
@@ -177,6 +188,23 @@ https://github.com/user-attachments/assets/04184975-7ee7-4ae0-8761-7a7550c5c8fe
 ### 3. Evaluation
 - We have unified the evaluation of most existing data science benchmarks using vLLM (with more being continuously added...). You can directly follow the introduction in [./playground](./playground) to quickly evaluate DeepAnalyze or your own agent.
 
+
+## 👏 Contribution
+> We welcome all forms of contributions, and merged PRs will be listed as contributors.
+### Contribution on Code and Model
+
+- We welcome all forms of contributions on DeepAnalyze's code, model and UI, such as Docker packaging, DeepAnalyze model conversion and quantization, and submitting DeepAnalyze workflows based on closed-source LLMs. 
+- You can submit a pull request directly.
+
+### Contribution on Case Study
+
+- We also especially encourage you to share your use cases and feedback when using DeepAnalyze; these are extremely valuable for helping us improve DeepAnalyze.
+- You can place your use cases in a new folder under [`.example/`](.example/). We recommend following the folder structure of [`.example/analysis_on_student_loan/`](.example/analysis_on_student_loan/), which includes three parts:
+    - `data/`: stores the uploaded files
+    - `prompt.txt`: input instructions
+    - `README.md`: documentation. We suggest including the input, DeepAnalyze’s output, outputs from other closed-source LLMs (optional), and your evaluation/comments of the case.
+- DeepAnalyze only has 8B parameters, so we also welcome examples where DeepAnalyze performs slightly worse than the closed-source LLMs — this will help us improve DeepAnalyze.
+
 ## 🤝 Acknowledgement
 - Training framework: [ms-swift](https://github.com/modelscope/ms-swift), [SkyRL](https://github.com/NovaSky-AI/SkyRL)
 - Source of Training Data: [Reasoning-Table](https://github.com/MJinXiang/Reasoning-Table), [Spider](https://yale-lily.github.io/spider), [BIRD](https://bird-bench.github.io/), [DABStep](https://huggingface.co/blog/dabstep)
@@ -198,3 +226,15 @@ If this repository is useful for you, please cite as:
 ```
 
 If you have any questions, please feel free to submit an issue or contact `zhangshaolei98@ruc.edu.cn`.
+
+## 🌟 Misc
+
+Welcome to join the [DeepAnalyze WeChat group](./assets/wechat.jpg), chat and share ideas with others!
+
+<p align="left" width="100%">
+<img src="./assets/wechat.jpg" alt="DeepAnalyze" style="width: 30%; min-width: 300px; display: block; margin: auto;">
+</p>
+
+If you like DeepAnalyze, give it a GitHub Star ⭐. 
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ruc-datalab/DeepAnalyze&type=date&legend=top-left)](https://www.star-history.com/#ruc-datalab/DeepAnalyze&type=date&legend=top-left)
